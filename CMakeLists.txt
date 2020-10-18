@@ -79,6 +79,13 @@ endif()
 enable_testing()
 
 #
+# Add support for coverage build
+#
+if(CMAKE_BUILD_TYPE MATCHES "Coverage")
+  set(CMAKE_CXX_FLAGS "-g -O0 --coverage")
+endif()
+
+#
 # FIX Engine Library
 #
 

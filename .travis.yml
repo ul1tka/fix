@@ -38,7 +38,7 @@ language: cpp
     - ./ci/build.sh
 
 .use_gcc_: &use_gcc
-  CC=gcc-10 CXX=g++-10
+  CC=gcc-10 CXX=g++-10 GCOV=gcov-10
 
 .use_clang_: &use_clang
   CC=clang-12 CXX=clang++-12
@@ -67,6 +67,12 @@ matrix:
       env:
         - *use_clang
         - BUILD_TYPE=Release
+    - <<: *linux
+      before_install:
+        - pip install --user cpp-coveralls
+      env:
+        - *use_gcc
+        - BUILD_TYPE=Coverage
     - <<: *macos
       env:
         - BUILD_TYPE=Debug CC=clang CXX=clang++
