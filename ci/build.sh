@@ -44,3 +44,12 @@ ctest \
     --parallel \
     --schedule-random \
     --output-on-failure
+
+if [ "${BUILD_TYPE}" = "Coverage" ]; then
+    cd ..
+    coveralls \
+	--gcov "${GCOV:=gcov}" \
+	--gcov-options '\-lp' \
+	--exclude-pattern '.*/build/CMakeFiles/.*' \
+	--exclude-pattern '.*/build/_deps/.*'
+fi
