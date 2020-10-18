@@ -20,6 +20,8 @@ set -ex
 
 mkdir build && cd build
 
+export MAKEFLAGS="-j"
+
 command -v ninja >/dev/null && CMAKE_FLAGS="-GNinja"
 
 test -n "${CC}" && CMAKE_FLAGS="${CMAKE_FLAGS} -DCMAKE_C_COMPIER=${CC}"
