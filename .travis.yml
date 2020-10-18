@@ -1,0 +1,78 @@
+#
+# Copyright (C) 2020 Vlad Lazarenko <vlad@lazarenko.me>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+#
+# Travis CI Build Config Explorer - https://config.travis-ci.com/explore
+#
+
+language: cpp
+
+.linux_: &linux
+  os: linux
+  dist: focal
+  arch: amd64
+  addons:
+    apt:
+      sources:
+        - sourceline: 'ppa:ubuntu-toolchain-r/test'
+        - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal main'
+          key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+      packages:
+        - g++-10
+        - clang-12
+  script:
+    - ./ci/build.sh
+
+.use_gcc_: &use_gcc
+  CC=gcc-10 CXX=g++-10
+
+.use_clang_: &use_clang
+  CC=clang-12 CXX=clang++-12
+
+.macos_: &macos
+  os: osx
+  osx_image: xcode12.2
+  script:
+    - ./ci/build.sh
+
+matrix:
+  include:
+    - <<: *linux
+      env:
+        - *use_gcc
+        - BUILD_TYPE=Debug
+    - <<: *linux
+      env:
+        - *use_gcc
+        - BUILD_TYPE=Release
+    - <<: *linux
+      env:
+        - *use_clang
+        - BUILD_TYPE=Debug
+    - <<: *linux
+      env:
+        - *use_clang
+        - BUILD_TYPE=Release
+    - <<: *macos
+      env:
+        - BUILD_TYPE=Debug CC=clang CXX=clang++
+    - <<: *macos
+      env:
+        - BUILD_TYPE=Release CC=clang CXX=clang++
+
+notifications:
+  email: false
