@@ -24,7 +24,7 @@
 #endif
 
 #ifndef FIX_UNLIKELY
-# erorr "FIX_LIKELY macro is not defined"
+# erorr "FIX_UNLIKELY macro is not defined"
 #endif
 
 TEST(likely_unlikely, arguments)
