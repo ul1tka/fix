@@ -18,7 +18,7 @@
 #include <fix/version.hh>
 #include <string>
 #include <sstream>
-#include <gtest/gtest.h>
+#include "test.hh"
 
 TEST(version, parts)
 {

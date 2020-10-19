@@ -138,6 +138,7 @@ endif()
 add_executable(
   test-fix-engine
   test/version_test.cc
+  test/likely_unlikely_test.cc
 )
 
 target_link_libraries(
