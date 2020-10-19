@@ -35,7 +35,7 @@ language: cpp
         - g++-10
         - clang-12
   script:
-    - ./ci/build.sh
+    - ./build.sh
 
 .use_gcc_: &use_gcc
   CC=gcc-10 CXX=g++-10 GCOV=gcov-10
@@ -47,7 +47,7 @@ language: cpp
   os: osx
   osx_image: xcode12.2
   script:
-    - ./ci/build.sh
+    - ./build.sh
 
 matrix:
   include:
