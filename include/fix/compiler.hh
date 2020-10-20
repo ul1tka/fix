@@ -21,4 +21,6 @@
 #define FIX_LIKELY(...)   __builtin_expect(!!(__VA_ARGS__), 1)
 #define FIX_UNLIKELY(...) __builtin_expect(!!(__VA_ARGS__), 0)
 
+#define FIX_RESTRICT __restrict__
+
 #endif // FIX_COMPILER_HH
