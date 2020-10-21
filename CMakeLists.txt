@@ -103,6 +103,7 @@ configure_file(
 add_library(
   fix-engine
   src/version.cc
+  src/decimal.cc
 )
 
 target_include_directories(
@@ -115,6 +116,8 @@ target_include_directories(
 target_compile_options(
   fix-engine
   PUBLIC
+    -Wall
+    -Wextra
     -Werror
     -Wno-c++98-compat
     -Wno-c++98-compat-pedantic
@@ -140,6 +143,7 @@ add_executable(
   test/version_test.cc
   test/likely_unlikely_test.cc
   test/capacitor_test.cc
+  test/decimal_test.cc
 )
 
 target_link_libraries(
