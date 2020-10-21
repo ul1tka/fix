@@ -103,6 +103,7 @@ configure_file(
 add_library(
   fix-engine
   src/version.cc
+  src/chrono.cc
   src/decimal.cc
 )
 
@@ -144,6 +145,10 @@ add_executable(
   test/likely_unlikely_test.cc
   test/capacitor_test.cc
   test/decimal_test.cc
+  test/load_chrono_test.cc
+  test/load_decimal_test.cc
+  test/load_raw_test.cc
+  test/load_test.cc
 )
 
 target_link_libraries(
