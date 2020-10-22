@@ -51,5 +51,6 @@ if [ "${BUILD_TYPE}" = "Coverage" ]; then
 	--gcov "${GCOV:=gcov}" \
 	--gcov-options '\-lp' \
 	--exclude-pattern '.*/build/CMakeFiles/.*' \
-	--exclude-pattern '.*/build/_deps/.*'
+	--exclude-pattern '.*/build/_deps/.*' \
+	--exclude-pattern '.*/bench/.*'
 fi
