@@ -76,6 +76,10 @@ if(NOT benchmark_POPULATED)
   add_subdirectory(${benchmark_SOURCE_DIR} ${benchmark_BINARY_DIR})
 endif()
 
+get_target_property(INCLUDE_DIRECTORIES benchmark INTERFACE_INCLUDE_DIRECTORIES)
+set_target_properties(benchmark PROPERTIES
+  INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${INCLUDE_DIRECTORIES}")
+
 enable_testing()
 
 #
@@ -146,6 +150,7 @@ add_executable(
   test/likely_unlikely_test.cc
   test/capacitor_test.cc
   test/decimal_test.cc
+  test/checksum_test.cc
   test/load_chrono_test.cc
   test/load_number_test.cc
   test/load_decimal_test.cc
@@ -165,6 +170,25 @@ target_link_libraries(
 
 target_compile_options(
   test-fix-engine
+  PRIVATE
+    -Wno-global-constructors
+)
+
+add_executable(
+  bench-fix-engine
+  bench/main.cc
+  bench/checksum_bench.cc
+)
+
+target_link_libraries(
+  bench-fix-engine
+  PRIVATE
+    benchmark
+    fix-engine
+)
+
+target_compile_options(
+  bench-fix-engine
   PRIVATE
     -Wno-global-constructors
 )
