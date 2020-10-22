@@ -123,6 +123,7 @@ target_compile_options(
     -Wno-c++98-compat
     -Wno-c++98-compat-pedantic
     -Wno-padded
+    -Wno-gnu-zero-variadic-macro-arguments
     -fno-exceptions
     -fno-rtti
     -ffast-math
@@ -146,9 +147,11 @@ add_executable(
   test/capacitor_test.cc
   test/decimal_test.cc
   test/load_chrono_test.cc
+  test/load_number_test.cc
   test/load_decimal_test.cc
   test/load_raw_test.cc
   test/load_test.cc
+  test/store_test.cc
 )
 
 target_link_libraries(
