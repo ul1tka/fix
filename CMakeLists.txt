@@ -94,6 +94,7 @@ endif()
 #
 
 set(FIX_VERSION 1)
+set(FIX_MAX_BODY_LENGTH_DIGITS 5)
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/fix/detail)
 
@@ -104,11 +105,19 @@ configure_file(
   NEWLINE_STYLE UNIX
 )
 
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/fix/config.hh.in
+  ${CMAKE_CURRENT_BINARY_DIR}/include/fix/config.hh
+  @ONLY
+  NEWLINE_STYLE UNIX
+)
+
 add_library(
   fix-engine
   src/version.cc
   src/chrono.cc
   src/decimal.cc
+  src/store/header.cc
 )
 
 target_include_directories(
@@ -156,6 +165,7 @@ add_executable(
   test/load_decimal_test.cc
   test/load_raw_test.cc
   test/load_test.cc
+  test/store_header_test.cc
   test/store_test.cc
 )
 
