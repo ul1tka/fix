@@ -48,13 +48,29 @@ header::header(
     data_ << "\00149=" << sender << "\00156=" << target << "\00134=";
 }
 
+std::byte* header::append(std::size_t size)
+{
+    data_.reserve(data_.size() + size);
+    data_.resize(data_.size() - 3);
+    const auto offset = data_.size();
+    data_.resize(data_.size() + size);
+    data_ << "34=";
+    return &data_.at(offset);
+}
+
+std::byte* header::append(const std::byte* data, std::size_t size)
+{
+    data_.reserve(data_.size() + size);
+    data_.resize(data_.size() - 3);
+    const auto offset = data_.size();
+    data_.insert(data_.end(), data, data + size);
+    data_ << "34=";
+    return &data_.at(offset);
+}
+
 void header::append(std::string_view data)
 {
-    data_.reserve(data_.size() + data.size());
-    data_.resize(data_.size() - 3);
-    auto p = reinterpret_cast<const std::byte*>(data.data());
-    data_.insert(data_.end(), p, p + data.size());
-    data_ << "34=";
+    append(reinterpret_cast<const std::byte*>(data.data()), data.size());
 }
 
 } // namespace fix

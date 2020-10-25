@@ -36,6 +36,10 @@ public:
 
     void append(std::string_view data);
 
+    std::byte* append(std::size_t size);
+
+    std::byte* append(const std::byte* data, std::size_t size);
+
     template <typename T>
     void store(T& buffer, char type) const
     {
@@ -62,10 +66,16 @@ public:
     }
 
 private:
+    /// @todo Allocate all at once.
     std::vector<std::byte> data_;
     unsigned int begin_off_{};
 };
 
 } // namespace fix
+
+#define FIX_STORE_BEGIN(Buffer, Header, Type, Sequence) \
+    do {                                                \
+        (Header).store((Buffer), (Type));               \
+    } while (false)
 
 #endif // FIX_STORE_HEADER_HH

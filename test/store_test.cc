@@ -48,6 +48,13 @@ TEST(store, char)
     EXPECT_EQ("7346=!\001", buffer.as_string());
 }
 
+TEST(store, string)
+{
+    fix::test::buffer buffer;
+    FIX_STORE_STRING(buffer, 98765, std::string_view{"XYZ"});
+    EXPECT_EQ("98765=XYZ\001", buffer.as_string());
+}
+
 TEST(store, month_year)
 {
     fix::test::buffer buffer;

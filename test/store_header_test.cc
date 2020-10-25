@@ -16,6 +16,7 @@
 //
 
 #include <fix/store/header.hh>
+#include <fix/store/string.hh>
 #include <fix/config.hh>
 #include "buffer.hh"
 #include "test.hh"
@@ -75,4 +76,19 @@ TEST(store, header_custom_data)
     EXPECT_EQ((make_raw_header("FIX.4.3", "From", "To", "D")
                .append("115=Client\001128=Exchange\00134=")),
               buffer.as_string());
+}
+
+TEST(store, header_as_buffer)
+{
+    fix::header header{"FIX.4.2", "Broker", "Exchange"};
+
+    FIX_STORE_STRING(header, 115, std::string_view{"Trader"});
+    FIX_STORE_STRING(header, 128, std::string_view{"DarkPool"});
+    fix::test::buffer buffer;
+    FIX_STORE_BEGIN(buffer, header, '!', 12345);
+    EXPECT_EQ((make_raw_header("FIX.4.2", "Broker", "Exchange", "!")
+               .append("115=Trader\001128=DarkPool\00134=")),
+              buffer.as_string());
+
+    /// @todo Check sequence serialization...
 }
