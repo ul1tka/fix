@@ -43,17 +43,19 @@ static std::string make_raw_header(
 static std::string make_header(
     std::string_view proto,
     std::string_view sender, std::string_view target,
-    std::string_view type
+    std::string_view type,
+    std::uint64_t sequence
 ) {
-    return make_raw_header(proto, sender, target, type).append("34=");
+    return make_raw_header(proto, sender, target, type)
+        .append("34=").append(std::to_string(sequence)).append(1, '\001');
 }
 
 TEST(store, header_simple)
 {
     fix::test::buffer buffer;
     fix::header ctx{"FIX.4.1", "Sender", "Target"};
-    ctx.store(buffer, '0');
-    EXPECT_EQ(make_header("FIX.4.1", "Sender", "Target", "0"),
+    ctx.store(buffer, '0', 12345);
+    EXPECT_EQ(make_header("FIX.4.1", "Sender", "Target", "0", 12345),
               buffer.as_string());
 }
 
@@ -61,8 +63,8 @@ TEST(store, header_long_type)
 {
     fix::test::buffer buffer;
     fix::header ctx{"FIX.4.2", "tx", "rx"};
-    ctx.store(buffer, "XYZ");
-    EXPECT_EQ(make_header("FIX.4.2", "tx", "rx", "XYZ"),
+    ctx.store(buffer, "XYZ", 3489);
+    EXPECT_EQ(make_header("FIX.4.2", "tx", "rx", "XYZ", 3489),
               buffer.as_string());
 }
 
@@ -72,9 +74,9 @@ TEST(store, header_custom_data)
     fix::header ctx{"FIX.4.3", "From", "To"};
     ctx.append("115=Client\001");
     ctx.append("128=Exchange\001");
-    ctx.store(buffer, 'D');
+    ctx.store(buffer, 'D', 872345);
     EXPECT_EQ((make_raw_header("FIX.4.3", "From", "To", "D")
-               .append("115=Client\001128=Exchange\00134=")),
+               .append("115=Client\001128=Exchange\00134=872345\001")),
               buffer.as_string());
 }
 
@@ -87,7 +89,7 @@ TEST(store, header_as_buffer)
     fix::test::buffer buffer;
     FIX_STORE_BEGIN(buffer, header, '!', 12345);
     EXPECT_EQ((make_raw_header("FIX.4.2", "Broker", "Exchange", "!")
-               .append("115=Trader\001128=DarkPool\00134=")),
+               .append("115=Trader\001128=DarkPool\00134=12345\001")),
               buffer.as_string());
 
     /// @todo Check sequence serialization...

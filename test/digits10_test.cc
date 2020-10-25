@@ -15,21 +15,21 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#ifndef FIX_STORE_MACROS_HH
-#define FIX_STORE_MACROS_HH
+#include <fix/digits10.hh>
+#include <limits>
+#include "test.hh"
 
-#include <cstddef>
-
-#define FIX_STRINGIFY(X) #X
-
-#define FIX_STORE_TAG(Tag)                                       \
-    reinterpret_cast<const std::byte*>(FIX_STRINGIFY(Tag) "="),  \
-    sizeof(FIX_STRINGIFY(Tag))
-
-#define FIX_STORE(Buffer, Tag, Value)                   \
-    do {                                                \
-        using namespace fix;                            \
-        store((Buffer), FIX_STORE_TAG(Tag), (Value));   \
-    } while (false)
-
-#endif // FIX_STORE_MACROS_HH
+TEST(digits10, basic)
+{
+    EXPECT_EQ(1, fix::digits10(0));
+    EXPECT_EQ(1, fix::digits10(1));
+    EXPECT_EQ(1, fix::digits10(9));
+    EXPECT_EQ(2, fix::digits10(10));
+    EXPECT_EQ(2, fix::digits10(99));
+    EXPECT_EQ(3, fix::digits10(100));
+    EXPECT_EQ(3, fix::digits10(999));
+    EXPECT_EQ(
+        std::numeric_limits<std::uint64_t>::digits10 + 1,
+        fix::digits10(std::numeric_limits<std::uint64_t>::max())
+    );
+}

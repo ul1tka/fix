@@ -15,21 +15,39 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#ifndef FIX_STORE_MACROS_HH
-#define FIX_STORE_MACROS_HH
+#ifndef FIX_DIGITS10_HH
+#define FIX_DIGITS10_HH
 
-#include <cstddef>
+#include <climits>
+#include <cstdint>
+#include <cassert>
 
-#define FIX_STRINGIFY(X) #X
+namespace fix {
 
-#define FIX_STORE_TAG(Tag)                                       \
-    reinterpret_cast<const std::byte*>(FIX_STRINGIFY(Tag) "="),  \
-    sizeof(FIX_STRINGIFY(Tag))
+namespace detail {
 
-#define FIX_STORE(Buffer, Tag, Value)                   \
-    do {                                                \
-        using namespace fix;                            \
-        store((Buffer), FIX_STORE_TAG(Tag), (Value));   \
-    } while (false)
+extern const std::uint64_t pow10[20];
 
-#endif // FIX_STORE_MACROS_HH
+} // namespace detail
+
+inline unsigned int
+digits10(std::uint64_t value) noexcept
+{
+    if (value == 0)
+        return 1;
+    const auto bits = (
+        static_cast<int>(sizeof(value) * CHAR_BIT - 1) -
+        __builtin_clzll(value)
+    );
+    const auto length = ((bits * 77) / 256) + 1;
+    assert(length >= 0);
+    assert(
+        static_cast<std::size_t>(length) <
+        (sizeof(detail::pow10) / sizeof(detail::pow10[0]))
+    );
+    return static_cast<unsigned int>(length + (value >= detail::pow10[length]));
+}
+
+} // namespace fix
+
+#endif

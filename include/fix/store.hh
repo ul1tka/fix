@@ -21,6 +21,7 @@
 #include "store/bool.hh"
 #include "store/byte.hh"
 #include "store/char.hh"
+#include "store/number.hh"
 #include "store/string.hh"
 #include "store/chrono.hh"
 #include "store/header.hh"

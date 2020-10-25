@@ -17,7 +17,6 @@
 
 #include <fix/checksum.hh>
 #include <random>
-#include <sstream>
 #include "benchmark.hh"
 
 namespace {
@@ -86,8 +85,6 @@ struct unrolled_4 final {
     }
 };
 
-} // anonymous namespace
-
 template <typename T>
 static void checksum(benchmark::State& state)
 {
@@ -125,6 +122,8 @@ static void checksum(benchmark::State& state)
         }
     }
 }
+
+} // anonymous namespace
 
 #define CHECKSUM_BENCHMARK(type) \
     BENCHMARK_TEMPLATE(checksum, type) \
