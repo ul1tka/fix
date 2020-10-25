@@ -15,15 +15,21 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#ifndef FIX_STORE_HH
-#define FIX_STORE_HH
+#ifndef FIX_STORE_STRING_HH
+#define FIX_STORE_STRING_HH
 
-#include "store/bool.hh"
-#include "store/byte.hh"
-#include "store/char.hh"
-#include "store/string.hh"
-#include "store/chrono.hh"
-#include "store/header.hh"
-#include "store/macros.hh"
+#include <cstring>
 
-#endif // FIX_STORE_HH
+#define FIX_STORE_STRING(Buffer, Tag, Value)        \
+    do {                                            \
+        decltype(auto) fix_store_buf_ = (Buffer);   \
+        auto q = (fix_store_buf_).append(           \
+            sizeof(#Tag) + 1 + (Value).size());     \
+        auto n = (Value).size();                    \
+        std::memcpy(q, #Tag "=", sizeof(#Tag));     \
+        q += sizeof(#Tag);                          \
+        std::memcpy(q, (Value).data(), n);          \
+        q[n] = std::byte{'\1'};                     \
+    } while (false)
+
+#endif // FIX_STORE_STRING_HH

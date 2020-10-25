@@ -15,15 +15,15 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#ifndef FIX_STORE_HH
-#define FIX_STORE_HH
+#ifndef FIX_CONFIG_HH
+#define FIX_CONFIG_HH
 
-#include "store/bool.hh"
-#include "store/byte.hh"
-#include "store/char.hh"
-#include "store/string.hh"
-#include "store/chrono.hh"
-#include "store/header.hh"
-#include "store/macros.hh"
+namespace fix {
 
-#endif // FIX_STORE_HH
+constexpr unsigned int max_body_length_digits() noexcept {
+    return @FIX_MAX_BODY_LENGTH_DIGITS@;
+}
+
+} // namespace fix
+
+#endif // FIX_CONFIG_HH

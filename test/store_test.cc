@@ -16,45 +16,8 @@
 //
 
 #include <fix/store.hh>
-#include <string>
-#include <vector>
+#include "buffer.hh"
 #include "test.hh"
-
-namespace {
-
-class test_buffer {
-    std::vector<std::byte> data_;
-
-public:
-    test_buffer() noexcept = default;
-
-    std::byte* append(std::size_t size)
-    {
-        const auto n = data_.size();
-        data_.resize(n + size);
-        return &data_[0] + n;
-    }
-
-    std::byte* append(const std::byte* data, std::size_t size)
-    {
-        return &*data_.insert(data_.end(), data, data + size);
-    }
-
-    void clear()
-    {
-        data_.clear();
-    }
-
-    std::string as_string()
-    {
-        return std::string{
-            data_.empty() ? "" : reinterpret_cast<const char*>(&data_[0]),
-            data_.size()
-        };
-    }
-};
-
-} // anonymous namespace
 
 TEST(store, tag)
 {
@@ -67,7 +30,7 @@ TEST(store, tag)
 
 TEST(store, bool)
 {
-    test_buffer buffer;
+    fix::test::buffer buffer;
     FIX_STORE_BOOL(buffer, 3846, false);
     EXPECT_EQ("3846=N\001", buffer.as_string());
     buffer.clear();
@@ -77,7 +40,7 @@ TEST(store, bool)
 
 TEST(store, char)
 {
-    test_buffer buffer;
+    fix::test::buffer buffer;
     FIX_STORE_CHAR(buffer, 98765, 'X');
     EXPECT_EQ("98765=X\001", buffer.as_string());
     buffer.clear();
@@ -85,30 +48,37 @@ TEST(store, char)
     EXPECT_EQ("7346=!\001", buffer.as_string());
 }
 
+TEST(store, string)
+{
+    fix::test::buffer buffer;
+    FIX_STORE_STRING(buffer, 98765, std::string_view{"XYZ"});
+    EXPECT_EQ("98765=XYZ\001", buffer.as_string());
+}
+
 TEST(store, month_year)
 {
-    test_buffer buffer;
+    fix::test::buffer buffer;
     FIX_STORE_MONTH_YEAR(buffer, 68, fix::month_year(1986, 1));
     EXPECT_EQ("68=198601\001", buffer.as_string());
 }
 
 TEST(store, date)
 {
-    test_buffer buffer;
+    fix::test::buffer buffer;
     FIX_STORE_DATE(buffer, 2020, fix::date(1986, 1, 19));
     EXPECT_EQ("2020=19860119\001", buffer.as_string());
 }
 
 TEST(store, time)
 {
-    test_buffer buffer;
+    fix::test::buffer buffer;
     FIX_STORE_TIME(buffer, 74867, fix::time(19, 01, 5, 987));
     EXPECT_EQ("74867=19:01:05.987\001", buffer.as_string());
 }
 
 TEST(store, datetime)
 {
-    test_buffer buffer;
+    fix::test::buffer buffer;
     FIX_STORE_DATETIME(
         buffer, 464,
         fix::datetime(fix::date(2020, 1, 13), fix::time(21, 19, 1, 23))
