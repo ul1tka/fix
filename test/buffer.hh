@@ -28,6 +28,11 @@ class buffer final {
 public:
     buffer() noexcept = default;
 
+    std::byte* data()
+    {
+        return &data_.front();
+    }
+
     std::byte* append(std::size_t size)
     {
         const auto n = data_.size();
@@ -39,6 +44,11 @@ public:
     {
         auto it = data_.insert(data_.end(), data, data + size);
         return &(*it);
+    }
+
+    void append(std::string_view data)
+    {
+        append(reinterpret_cast<const std::byte*>(data.data()), data.size());
     }
 
     void clear()

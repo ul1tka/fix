@@ -28,13 +28,19 @@
 
 namespace fix {
 
+class datetime;
+
 class header final {
 public:
+    header() noexcept = default;
+
     header(
         std::string_view proto,
         std::string_view sender,
         std::string_view target
     ) noexcept;
+
+    void set_time(const datetime& value) noexcept;
 
     void append(std::string_view data);
 
@@ -71,6 +77,18 @@ public:
         num2str(dst, sequence, dig);
     }
 
+    void store_tail(std::byte* data, std::byte* last_tag) const;
+
+    template <typename T>
+    void store_tail(T& buffer) const
+    {
+        auto last_tag = buffer.append(7);
+        store_tail(
+            static_cast<std::byte*>(buffer.data()),
+            static_cast<std::byte*>(last_tag)
+        );
+    }
+
 private:
     /// @todo Allocate all at once.
     std::vector<std::byte> data_;
@@ -82,6 +100,11 @@ private:
 #define FIX_STORE_BEGIN(Buffer, Header, Type, Sequence) \
     do {                                                \
         (Header).store((Buffer), (Type), (Sequence));   \
+    } while (false)
+
+#define FIX_STORE_END(Buffer, Header)                   \
+    do {                                                \
+        (Header).store_tail((Buffer));                  \
     } while (false)
 
 #endif // FIX_STORE_HEADER_HH

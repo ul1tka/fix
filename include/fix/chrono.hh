@@ -18,6 +18,7 @@
 #ifndef FIX_CHRONO_HH
 #define FIX_CHRONO_HH
 
+#include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <cassert>
@@ -110,9 +111,9 @@ class datetime final {
 public:
     datetime() noexcept = default;
 
-    datetime(std::time_t seconds, std::uint16_t ms = 0) noexcept;
+    explicit datetime(std::time_t seconds, std::uint16_t ms = 0) noexcept;
 
-    datetime(const timespec& spec) noexcept
+    explicit datetime(const timespec& spec) noexcept
         : datetime{
             spec.tv_sec,
             static_cast<std::uint16_t>(spec.tv_nsec / 1000000)
@@ -120,10 +121,35 @@ public:
     {
     }
 
-    constexpr datetime(const date& date, const time& time) noexcept
+    constexpr explicit datetime(const date& date, const time& time) noexcept
         : year_{date.year()}, month_{date.month()}, day_{date.day()}
         , hours_{time.hours()}, minutes_{time.minutes()}
         , seconds_{time.seconds()}, ms_{time.milliseconds()}
+    {
+    }
+
+    template <typename Rep, typename Period>
+    explicit
+    datetime(std::chrono::duration<Rep, Period> duration) noexcept
+        : datetime{
+            static_cast<std::time_t>(
+                std::chrono::duration_cast<std::chrono::seconds>(
+                    duration
+                ).count()
+            ),
+            static_cast<std::uint16_t>(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    duration
+                ).count() % 1000
+            )
+          }
+    {
+    }
+
+    template <typename Clock, typename Duration>
+    explicit
+    datetime(std::chrono::time_point<Clock, Duration> time_point) noexcept
+        : datetime{time_point.time_since_epoch()}
     {
     }
 

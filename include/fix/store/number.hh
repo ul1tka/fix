@@ -21,30 +21,33 @@
 #include "../digits10.hh"
 #include <cstddef>
 #include <cstring>
+#include <cassert>
 
 namespace fix {
 
 inline void
-num2str(std::byte* p, std::uint64_t v, unsigned int x)
+num2str(std::byte* p, std::uint64_t v, unsigned int x) noexcept
 {
+    assert(x > 0);
     p[x] = std::byte{'\1'};
-    while (v >= 10) {
+    for (;;) {
         const auto q = v / 10;
         const auto r = v % 10;
         p[--x] = std::byte(r + '0');
+        if (!x)
+            break;
         v = q;
     }
-    p[--x] = std::byte(v + '0');
 }
 
 inline void
-num2str(std::byte* p, std::uint64_t v)
+num2str(std::byte* p, std::uint64_t v) noexcept
 {
     return num2str(p, v, digits10(v));
 }
 
 template <typename Buffer>
-inline void store(
+void store(
     Buffer& buffer,
     const std::byte* tag_data, std::size_t tag_len,
     std::uint64_t value
