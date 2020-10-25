@@ -15,21 +15,31 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#ifndef FIX_STORE_MACROS_HH
-#define FIX_STORE_MACROS_HH
+#include <fix/digits10.hh>
 
-#include <cstddef>
+namespace fix::detail {
 
-#define FIX_STRINGIFY(X) #X
+const std::uint64_t pow10[20] = {
+    1UL,
+    10UL,
+    100UL,
+    1000UL,
+    10000UL,
+    100000UL,
+    1000000UL,
+    10000000UL,
+    100000000UL,
+    1000000000UL,
+    10000000000UL,
+    100000000000UL,
+    1000000000000UL,
+    10000000000000UL,
+    100000000000000UL,
+    1000000000000000UL,
+    10000000000000000UL,
+    100000000000000000UL,
+    1000000000000000000UL,
+    10000000000000000000UL
+};
 
-#define FIX_STORE_TAG(Tag)                                       \
-    reinterpret_cast<const std::byte*>(FIX_STRINGIFY(Tag) "="),  \
-    sizeof(FIX_STRINGIFY(Tag))
-
-#define FIX_STORE(Buffer, Tag, Value)                   \
-    do {                                                \
-        using namespace fix;                            \
-        store((Buffer), FIX_STORE_TAG(Tag), (Value));   \
-    } while (false)
-
-#endif // FIX_STORE_MACROS_HH
+} // namespace fix::detail

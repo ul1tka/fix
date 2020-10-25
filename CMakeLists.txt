@@ -117,6 +117,7 @@ add_library(
   src/version.cc
   src/chrono.cc
   src/decimal.cc
+  src/digits10.cc
   src/store/header.cc
 )
 
@@ -159,6 +160,7 @@ add_executable(
   test/likely_unlikely_test.cc
   test/capacitor_test.cc
   test/decimal_test.cc
+  test/digits10_test.cc
   test/checksum_test.cc
   test/load_chrono_test.cc
   test/load_number_test.cc
@@ -188,6 +190,7 @@ add_executable(
   bench-fix-engine
   bench/main.cc
   bench/checksum_bench.cc
+  bench/digits10_bench.cc
 )
 
 target_link_libraries(

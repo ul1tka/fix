@@ -55,6 +55,22 @@ TEST(store, string)
     EXPECT_EQ("98765=XYZ\001", buffer.as_string());
 }
 
+TEST(store, number_u64)
+{
+    std::uint64_t v = 1986;
+    fix::test::buffer buffer;
+    FIX_STORE(buffer, 1962, v);
+    EXPECT_EQ("1962=1986\1", buffer.as_string());
+}
+
+TEST(store, number_u32)
+{
+    std::uint32_t v = 1968;
+    fix::test::buffer buffer;
+    FIX_STORE(buffer, 1986, v);
+    EXPECT_EQ("1986=1968\1", buffer.as_string());
+}
+
 TEST(store, month_year)
 {
     fix::test::buffer buffer;
