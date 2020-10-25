@@ -16,6 +16,8 @@
 //
 
 #include <fix/store/header.hh>
+#include <fix/store/chrono.hh>
+#include <fix/checksum.hh>
 #include <fix/config.hh>
 
 namespace fix {
@@ -45,7 +47,13 @@ header::header(
     data_ << "\00135=";
     begin_off_ = static_cast<unsigned int>(data_.size());
     data_.emplace_back(std::byte{' '});
-    data_ << "\00149=" << sender << "\00156=" << target << "\00134=";
+    data_ << "\00149=" << sender << "\00156=" << target
+          << "\00152=                     \00134=";
+}
+
+void header::set_time(const datetime& value) noexcept
+{
+    fix::store(&data_.back() - 24, value);
 }
 
 std::byte* header::append(std::size_t size)
@@ -71,6 +79,28 @@ std::byte* header::append(const std::byte* data, std::size_t size)
 void header::append(std::string_view data)
 {
     append(reinterpret_cast<const std::byte*>(data.data()), data.size());
+}
+
+void header::store_tail(std::byte* data, std::byte* last_tag) const
+{
+    auto begin = (data + (begin_off_ - 3));
+
+    assert(last_tag > begin);
+    const auto body_length = static_cast<unsigned int>(last_tag - begin);
+    begin -= (max_body_length_digits() + 1);
+
+    num2str(begin, body_length, max_body_length_digits());
+
+    last_tag[0] = std::byte{'1'};
+    last_tag[1] = std::byte{'0'};
+    last_tag[2] = std::byte{'='};
+    last_tag[6] = std::byte{'\1'};
+
+    num2str(
+        last_tag + 3,
+        checksum(data, static_cast<std::size_t>(last_tag - data)),
+        3
+    );
 }
 
 } // namespace fix

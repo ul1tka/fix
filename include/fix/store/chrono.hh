@@ -21,6 +21,35 @@
 #include "../chrono.hh"
 #include <cstring>
 
+namespace fix {
+
+inline void store(std::byte* q, const datetime& v) noexcept
+{
+    q[0] = static_cast<std::byte>(((v.year() / 1000) % 10) + '0');
+    q[1] = static_cast<std::byte>(((v.year() / 100) % 10) + '0');
+    q[2] = static_cast<std::byte>(((v.year() / 10) % 10) + '0');
+    q[3] = static_cast<std::byte>((v.year() % 10) + '0');
+    q[4] = static_cast<std::byte>(((v.month() / 10) % 10u) + '0');
+    q[5] = static_cast<std::byte>((v.month() % 10) + '0');
+    q[6] = static_cast<std::byte>(((v.day() / 10) % 10) + '0');
+    q[7] = static_cast<std::byte>((v.day() % 10) + '0');
+    q[8] = std::byte{'-'};
+    q[9] = static_cast<std::byte>(((v.hours() / 10) % 10) + '0');
+    q[10] = static_cast<std::byte>((v.hours() % 10) + '0');
+    q[11] = std::byte{':'};
+    q[12] = static_cast<std::byte>(((v.minutes() / 10) % 10u) + '0');
+    q[13] = static_cast<std::byte>((v.minutes() % 10) + '0');
+    q[14] = std::byte{':'};
+    q[15] = static_cast<std::byte>(((v.seconds() / 10) % 10) + '0');
+    q[16] = static_cast<std::byte>((v.seconds() % 10) + '0');
+    q[17] = std::byte{'.'};
+    q[18] = static_cast<std::byte>(((v.milliseconds() / 100) % 10) + '0');
+    q[19] = static_cast<std::byte>(((v.milliseconds() / 10) % 10) + '0');
+    q[20] = static_cast<std::byte>((v.milliseconds() % 10) + '0');
+}
+
+} // namespace fix
+
 #define FIX_STORE_CHRONO_(Buffer, Tag, Value, Size)                     \
     decltype(auto) fix_store_buf_ = (Buffer);                           \
     auto q = (fix_store_buf_).append(sizeof(#Tag) + Size);              \
@@ -72,33 +101,11 @@
         q[12] = std::byte{'\1'};                                              \
     } while (false)
 
-#define FIX_STORE_DATETIME(Buffer, Tag, Value)                            \
-    do {                                                                  \
-        FIX_STORE_CHRONO_(Buffer, Tag, Value, 22);                        \
-        q[0] = static_cast<std::byte>(((v.year() / 1000) % 10) + '0');    \
-        q[1] = static_cast<std::byte>(((v.year() / 100) % 10) + '0');     \
-        q[2] = static_cast<std::byte>(((v.year() / 10) % 10) + '0');      \
-        q[3] = static_cast<std::byte>((v.year() % 10) + '0');             \
-        q[4] = static_cast<std::byte>(((v.month() / 10) % 10u) + '0');    \
-        q[5] = static_cast<std::byte>((v.month() % 10) + '0');            \
-        q[6] = static_cast<std::byte>(((v.day() / 10) % 10) + '0');       \
-        q[7] = static_cast<std::byte>((v.day() % 10) + '0');              \
-        q[8] = std::byte{'-'};                                            \
-        q[9] = static_cast<std::byte>(((v.hours() / 10) % 10) + '0');     \
-        q[10] = static_cast<std::byte>((v.hours() % 10) + '0');           \
-        q[11] = std::byte{':'};                                           \
-        q[12] = static_cast<std::byte>(((v.minutes() / 10) % 10u) + '0'); \
-        q[13] = static_cast<std::byte>((v.minutes() % 10) + '0');         \
-        q[14] = std::byte{':'};                                           \
-        q[15] = static_cast<std::byte>(((v.seconds() / 10) % 10) + '0');  \
-        q[16] = static_cast<std::byte>((v.seconds() % 10) + '0');         \
-        q[17] = std::byte{'.'};                                           \
-        q[18] = static_cast<std::byte>(                                   \
-            ((v.milliseconds() / 100) % 10) + '0');                       \
-        q[19] = static_cast<std::byte>(                                   \
-            ((v.milliseconds() / 10) % 10) + '0');                        \
-        q[20] = static_cast<std::byte>((v.milliseconds() % 10) + '0');    \
-        q[21] = std::byte{'\1'};                                          \
+#define FIX_STORE_DATETIME(Buffer, Tag, Value)      \
+    do {                                            \
+        FIX_STORE_CHRONO_(Buffer, Tag, Value, 22);  \
+        store(q, (v));                              \
+        q[21] = std::byte{'\1'};                    \
     } while (false)
 
 #endif // FIX_STORE_CHRONO_HH

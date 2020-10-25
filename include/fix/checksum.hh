@@ -22,6 +22,7 @@
 
 namespace fix {
 
+/// @todo size should be unsigned int
 constexpr unsigned int
 checksum(const std::byte* data, std::size_t size) noexcept
 {
