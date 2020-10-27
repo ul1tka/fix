@@ -52,6 +52,7 @@ protected:
     fix::context context_;
 
     fix::datetime time_;
+    fix::sending_time send_time_;
 
     fix::test::buffer buffer_;
 };
@@ -78,8 +79,7 @@ void store_context::SetUp()
     context_ = fix::context{proto_, sender_, target_};
 
     time_ = fix::datetime{std::chrono::system_clock::now()};
-
-    context_.set_time(time_);
+    send_time_.set(time_);
 }
 
 std::uint64_t store_context::random_sequence()
@@ -102,14 +102,17 @@ std::string store_context::context(
     data += sender_;
     data += "\00156=";
     data += target_;
-    data += "\00152=";
+    data += "\001";
+
+    data += custom_data;
+
+    data += "52=";
 
     std::byte time_bytes[21];
     fix::store(time_bytes, time_);
     data.append(reinterpret_cast<const char*>(time_bytes),
                 sizeof(time_bytes));
     data.append(1, '\001');
-    data.append(custom_data);
     data += "34=";
     data += std::to_string(sequence);
     data += '\001';
@@ -121,14 +124,14 @@ std::string store_context::context(
 TEST_F(store_context, simple)
 {
     const auto seq = random_sequence();
-    FIX_STORE_BEGIN(buffer_, context_, '0', seq);
+    FIX_STORE_BEGIN(buffer_, context_, '0', send_time_, seq);
     EXPECT_EQ(context("0", seq), buffer_.as_string());
 }
 
 TEST_F(store_context, long_type)
 {
     const auto seq = random_sequence();
-    FIX_STORE_BEGIN(buffer_, context_, "XYZ", seq);
+    FIX_STORE_BEGIN(buffer_, context_, "XYZ", send_time_, seq);
     EXPECT_EQ(context("XYZ", seq), buffer_.as_string());
 }
 
@@ -137,7 +140,7 @@ TEST_F(store_context, custom_data)
     const auto seq = random_sequence();
     FIX_STORE_STRING(context_, 115, std::string_view{"Trader"});
     FIX_STORE_STRING(context_, 128, std::string_view{"DarkPool"});
-    FIX_STORE_BEGIN(buffer_, context_, 'D', seq);
+    FIX_STORE_BEGIN(buffer_, context_, 'D', send_time_, seq);
     EXPECT_EQ(context("D", seq, "115=Trader\001128=DarkPool\001"),
               buffer_.as_string());
 }
@@ -146,8 +149,9 @@ TEST(store, context_seal)
 {
     fix::test::buffer buffer;
     fix::context context{"FIX.4.2", "Trader", "DarkPool"};
-    context.set_time(fix::datetime{{1986, 1, 19}, {5, 30, 1, 3}});
-    FIX_STORE_BEGIN(buffer, context, 'A', 177);
+    fix::sending_time send_time;
+    send_time.set(fix::datetime{{1986, 1, 19}, {5, 30, 1, 3}});
+    FIX_STORE_BEGIN(buffer, context, 'A', send_time, 177);
     FIX_STORE_END(buffer, context);
     EXPECT_EQ("8=FIX.4.2\0019=00059\00135=A\00149=Trader\00156=DarkPool\001"
               "52=19860119-05:30:01.003\00134=177\00110=100\001",

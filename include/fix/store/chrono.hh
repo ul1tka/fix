@@ -20,6 +20,8 @@
 
 #include "../chrono.hh"
 #include <cstring>
+#include <cstddef>
+#include <array>
 
 namespace fix {
 

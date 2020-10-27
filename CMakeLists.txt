@@ -118,6 +118,7 @@ add_library(
   src/chrono.cc
   src/decimal.cc
   src/digits10.cc
+  src/store/sending_time.cc
   src/store/context.cc
 )
 
@@ -191,6 +192,7 @@ add_executable(
   bench/main.cc
   bench/checksum_bench.cc
   bench/digits10_bench.cc
+  bench/timestamp_bench.cc
 )
 
 target_link_libraries(

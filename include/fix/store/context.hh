@@ -19,7 +19,9 @@
 #define FIX_STORE_CONTEXT_HH
 
 #include "number.hh"
+#include "sending_time.hh"
 #include <string_view>
+#include <array>
 #include <vector>
 #include <cstdint>
 #include <cstddef>
@@ -27,8 +29,6 @@
 #include <cstring>
 
 namespace fix {
-
-class datetime;
 
 class context final {
 public:
@@ -40,8 +40,6 @@ public:
         std::string_view target
     ) noexcept;
 
-    void set_time(const datetime& value) noexcept;
-
     void append(std::string_view data);
 
     std::byte* append(std::size_t size);
@@ -49,22 +47,30 @@ public:
     std::byte* append(const std::byte* data, std::size_t size);
 
     template <typename T>
-    void store(T& buffer, char type, std::uint64_t sequence) const
-    {
+    void store_head(
+        T& buffer, char type,
+        const sending_time& timestamp, std::uint64_t sequence
+    ) const {
         assert(!data_.empty());
         const auto x = digits10(sequence);
         const auto n = data_.size();
-        auto p = buffer.append(&data_.front(), n + x + 1);
+        auto p = buffer.append(&data_.front(), n + x + 1 + timestamp.size());
         p[begin_off_] = std::byte(type);
-        num2str(p + n, sequence, x);
+        std::memcpy(p + n, timestamp.data(), timestamp.size());
+        num2str(p + n + timestamp.size(), sequence, x);
     }
 
     template <typename T>
-    void store(T& buffer, std::string_view type, std::uint64_t sequence) const
-    {
+    void store_head(
+        T& buffer, std::string_view type,
+        const sending_time& timestamp, std::uint64_t sequence
+    ) const {
         auto dig = digits10(sequence);
         auto off = begin_off_;
-        auto dst = buffer.append(data_.size() + type.size() + dig);
+        auto dst = buffer.append(
+            data_.size() + timestamp.size() +
+            type.size() + dig
+        );
         auto src = data_.data();
         std::memcpy(dst, src, off);
         dst += off;
@@ -74,6 +80,8 @@ public:
         auto n = static_cast<std::size_t>(&data_.back() - src);
         std::memcpy(dst, src + 1, n);
         dst += n;
+        std::memcpy(dst, timestamp.data(), timestamp.size());
+        dst += timestamp.size();
         num2str(dst, sequence, dig);
     }
 
@@ -97,9 +105,9 @@ private:
 
 } // namespace fix
 
-#define FIX_STORE_BEGIN(Buffer, Context, Type, Sequence)    \
-    do {                                                    \
-        (Context).store((Buffer), (Type), (Sequence));      \
+#define FIX_STORE_BEGIN(Buffer, Context, ...)           \
+    do {                                                \
+        (Context).store_head((Buffer), __VA_ARGS__);    \
     } while (false)
 
 #define FIX_STORE_END(Buffer, Context)          \

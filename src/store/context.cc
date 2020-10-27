@@ -50,31 +50,21 @@ context::context(
     begin_off_ = static_cast<unsigned int>(data_.size());
     data_.emplace_back(std::byte{' '});
     data_ << "\00149=" << sender << "\00156=" << target
-          << "\00152=                     \00134=";
-}
-
-void context::set_time(const datetime& value) noexcept
-{
-    fix::store(&data_.back() - 24, value);
+          << "\001";
 }
 
 std::byte* context::append(std::size_t size)
 {
-    data_.reserve(data_.size() + size);
-    data_.resize(data_.size() - 3);
     const auto offset = data_.size();
-    data_.resize(data_.size() + size);
-    data_ << "34=";
+    data_.resize(offset + size);
     return &data_.at(offset);
 }
 
 std::byte* context::append(const std::byte* data, std::size_t size)
 {
     data_.reserve(data_.size() + size);
-    data_.resize(data_.size() - 3);
     const auto offset = data_.size();
     data_.insert(data_.end(), data, data + size);
-    data_ << "34=";
     return &data_.at(offset);
 }
 
