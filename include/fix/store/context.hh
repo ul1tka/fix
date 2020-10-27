@@ -15,8 +15,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#ifndef FIX_STORE_HEADER_HH
-#define FIX_STORE_HEADER_HH
+#ifndef FIX_STORE_CONTEXT_HH
+#define FIX_STORE_CONTEXT_HH
 
 #include "number.hh"
 #include <string_view>
@@ -30,11 +30,11 @@ namespace fix {
 
 class datetime;
 
-class header final {
+class context final {
 public:
-    header() noexcept = default;
+    context() noexcept = default;
 
-    header(
+    context(
         std::string_view proto,
         std::string_view sender,
         std::string_view target
@@ -97,14 +97,14 @@ private:
 
 } // namespace fix
 
-#define FIX_STORE_BEGIN(Buffer, Header, Type, Sequence) \
-    do {                                                \
-        (Header).store((Buffer), (Type), (Sequence));   \
+#define FIX_STORE_BEGIN(Buffer, Context, Type, Sequence)    \
+    do {                                                    \
+        (Context).store((Buffer), (Type), (Sequence));      \
     } while (false)
 
-#define FIX_STORE_END(Buffer, Header)                   \
-    do {                                                \
-        (Header).store_tail((Buffer));                  \
+#define FIX_STORE_END(Buffer, Context)          \
+    do {                                        \
+        (Context).store_tail((Buffer));         \
     } while (false)
 
-#endif // FIX_STORE_HEADER_HH
+#endif // FIX_STORE_CONTEXT_HH

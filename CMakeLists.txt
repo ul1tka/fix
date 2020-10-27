@@ -118,7 +118,7 @@ add_library(
   src/chrono.cc
   src/decimal.cc
   src/digits10.cc
-  src/store/header.cc
+  src/store/context.cc
 )
 
 target_include_directories(
@@ -167,7 +167,7 @@ add_executable(
   test/load_decimal_test.cc
   test/load_raw_test.cc
   test/load_test.cc
-  test/store_header_test.cc
+  test/store_context_test.cc
   test/store_test.cc
 )
 

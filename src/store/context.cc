@@ -15,7 +15,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#include <fix/store/header.hh>
+#include <fix/store/context.hh>
 #include <fix/store/chrono.hh>
 #include <fix/checksum.hh>
 #include <fix/config.hh>
@@ -30,13 +30,15 @@ operator<<(std::vector<std::byte>& dst, std::string_view src)
     return dst;
 }
 
-header::header(
+context::context(
     std::string_view proto,
     std::string_view sender,
     std::string_view target
 ) noexcept {
-    const auto total_size = (proto.size() + sender.size() + target.size() +
-                             max_body_length_digits() + 21);
+    const auto total_size = (
+        proto.size() + sender.size() + target.size() +
+        max_body_length_digits() + 21
+    );
     data_.reserve(total_size);
     data_ << "8=";
     for (const auto c : proto)
@@ -51,12 +53,12 @@ header::header(
           << "\00152=                     \00134=";
 }
 
-void header::set_time(const datetime& value) noexcept
+void context::set_time(const datetime& value) noexcept
 {
     fix::store(&data_.back() - 24, value);
 }
 
-std::byte* header::append(std::size_t size)
+std::byte* context::append(std::size_t size)
 {
     data_.reserve(data_.size() + size);
     data_.resize(data_.size() - 3);
@@ -66,7 +68,7 @@ std::byte* header::append(std::size_t size)
     return &data_.at(offset);
 }
 
-std::byte* header::append(const std::byte* data, std::size_t size)
+std::byte* context::append(const std::byte* data, std::size_t size)
 {
     data_.reserve(data_.size() + size);
     data_.resize(data_.size() - 3);
@@ -76,12 +78,12 @@ std::byte* header::append(const std::byte* data, std::size_t size)
     return &data_.at(offset);
 }
 
-void header::append(std::string_view data)
+void context::append(std::string_view data)
 {
     append(reinterpret_cast<const std::byte*>(data.data()), data.size());
 }
 
-void header::store_tail(std::byte* data, std::byte* last_tag) const
+void context::store_tail(std::byte* data, std::byte* last_tag) const
 {
     auto begin = (data + (begin_off_ - 3));
 
