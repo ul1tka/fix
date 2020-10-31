@@ -105,14 +105,4 @@ private:
 
 } // namespace fix
 
-#define FIX_STORE_BEGIN(Buffer, Context, ...)           \
-    do {                                                \
-        (Context).store_head((Buffer), __VA_ARGS__);    \
-    } while (false)
-
-#define FIX_STORE_END(Buffer, Context)          \
-    do {                                        \
-        (Context).store_tail((Buffer));         \
-    } while (false)
-
 #endif // FIX_STORE_CONTEXT_HH
