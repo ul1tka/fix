@@ -73,6 +73,25 @@ void context::append(std::string_view data)
     append(reinterpret_cast<const std::byte*>(data.data()), data.size());
 }
 
+void context::store_head(
+    std::byte* dst, unsigned int dig, std::string_view type,
+    const sending_time& timestamp, std::uint64_t sequence
+) const {
+    auto off = begin_off_;
+    auto src = data_.data();
+    std::memcpy(dst, src, off);
+    dst += off;
+    std::memcpy(dst, type.data(), type.size());
+    dst += type.size();
+    src += off;
+    auto n = static_cast<std::size_t>(&data_.back() - src);
+    std::memcpy(dst, src + 1, n);
+    dst += n;
+    std::memcpy(dst, timestamp.data(), timestamp.size());
+    dst += timestamp.size();
+    num2str(dst, sequence, dig);
+}
+
 void context::store_tail(std::byte* data, std::byte* last_tag) const
 {
     auto begin = (data + (begin_off_ - 3));

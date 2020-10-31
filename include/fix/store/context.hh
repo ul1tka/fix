@@ -47,10 +47,9 @@ public:
     std::byte* append(const std::byte* data, std::size_t size);
 
     template <typename T>
-    void store_head(
-        T& buffer, char type,
-        const sending_time& timestamp, std::uint64_t sequence
-    ) const {
+    void store_head(T& buffer, char type, const sending_time& timestamp,
+                    std::uint64_t sequence) const
+    {
         assert(!data_.empty());
         const auto x = digits10(sequence);
         const auto n = data_.size();
@@ -61,43 +60,32 @@ public:
     }
 
     template <typename T>
-    void store_head(
-        T& buffer, std::string_view type,
-        const sending_time& timestamp, std::uint64_t sequence
-    ) const {
-        auto dig = digits10(sequence);
-        auto off = begin_off_;
-        auto dst = buffer.append(
-            data_.size() + timestamp.size() +
-            type.size() + dig
+    void store_head(T& buffer, std::string_view type,
+                    const sending_time& timestamp,
+                    std::uint64_t sequence) const
+    {
+        const auto dig = digits10(sequence);
+        store_head(
+            buffer.append(data_.size() + timestamp.size() + type.size() + dig),
+            dig, type, timestamp, sequence
         );
-        auto src = data_.data();
-        std::memcpy(dst, src, off);
-        dst += off;
-        std::memcpy(dst, type.data(), type.size());
-        dst += type.size();
-        src += off;
-        auto n = static_cast<std::size_t>(&data_.back() - src);
-        std::memcpy(dst, src + 1, n);
-        dst += n;
-        std::memcpy(dst, timestamp.data(), timestamp.size());
-        dst += timestamp.size();
-        num2str(dst, sequence, dig);
     }
-
-    void store_tail(std::byte* data, std::byte* last_tag) const;
 
     template <typename T>
     void store_tail(T& buffer) const
     {
         auto last_tag = buffer.append(7);
-        store_tail(
-            static_cast<std::byte*>(buffer.data()),
-            static_cast<std::byte*>(last_tag)
-        );
+        store_tail(static_cast<std::byte*>(buffer.data()),
+                   static_cast<std::byte*>(last_tag));
     }
 
 private:
+    void store_tail(std::byte* data, std::byte* last_tag) const;
+
+    void store_head(std::byte* dst, unsigned int dig,
+                    std::string_view type, const sending_time& timestamp,
+                    std::uint64_t sequence) const;
+
     /// @todo Allocate all at once.
     std::vector<std::byte> data_;
     unsigned int begin_off_{};
