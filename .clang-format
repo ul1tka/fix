@@ -1,0 +1,16 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+ColumnLimit: 120
+IndentWidth: 8
+TabWidth: 8
+UseTab: Never
+AccessModifierOffset: -4
+ConstructorInitializerIndentWidth: 8
+PointerAlignment: Left
+IndentPPDirectives: AfterHash
+AlwaysBreakTemplateDeclarations: Yes
+AlignTrailingComments: false
+CompactNamespaces: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+...
