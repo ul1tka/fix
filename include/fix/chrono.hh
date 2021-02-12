@@ -129,7 +129,6 @@ public:
     }
 
     template <typename Rep, typename Period>
-    explicit
     datetime(std::chrono::duration<Rep, Period> duration) noexcept
         : datetime{
             static_cast<std::time_t>(
@@ -147,7 +146,6 @@ public:
     }
 
     template <typename Clock, typename Duration>
-    explicit
     datetime(std::chrono::time_point<Clock, Duration> time_point) noexcept
         : datetime{time_point.time_since_epoch()}
     {

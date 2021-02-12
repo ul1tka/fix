@@ -24,7 +24,7 @@
 #include "store/number.hh"
 #include "store/string.hh"
 #include "store/chrono.hh"
-#include "store/header.hh"
+#include "store/context.hh"
 #include "store/macros.hh"
 
 #endif // FIX_STORE_HH

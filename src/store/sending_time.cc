@@ -15,22 +15,15 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#ifndef FIX_CHECKSUM_HH
-#define FIX_CHECKSUM_HH
-
-#include <cstddef>
+#include <fix/store/sending_time.hh>
+#include <fix/store/chrono.hh>
+#include <type_traits>
 
 namespace fix {
 
-constexpr unsigned int
-checksum(const std::byte* data, std::size_t size) noexcept
+void sending_time::set(const datetime& value) noexcept
 {
-    unsigned int s{};
-    for (std::size_t i = 0; i < size; ++i)
-        s += std::to_integer<unsigned int>(data[i]);
-    return s % 256;
+    store(&data_[3], value);
 }
 
 } // namespace fix
-
-#endif // FIX_CHECKSUM_HH

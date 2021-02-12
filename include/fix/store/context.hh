@@ -15,11 +15,13 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#ifndef FIX_STORE_HEADER_HH
-#define FIX_STORE_HEADER_HH
+#ifndef FIX_STORE_CONTEXT_HH
+#define FIX_STORE_CONTEXT_HH
 
 #include "number.hh"
+#include "sending_time.hh"
 #include <string_view>
+#include <array>
 #include <vector>
 #include <cstdint>
 #include <cstddef>
@@ -28,19 +30,15 @@
 
 namespace fix {
 
-class datetime;
-
-class header final {
+class context final {
 public:
-    header() noexcept = default;
+    context() noexcept = default;
 
-    header(
+    context(
         std::string_view proto,
         std::string_view sender,
         std::string_view target
     ) noexcept;
-
-    void set_time(const datetime& value) noexcept;
 
     void append(std::string_view data);
 
@@ -49,47 +47,45 @@ public:
     std::byte* append(const std::byte* data, std::size_t size);
 
     template <typename T>
-    void store(T& buffer, char type, std::uint64_t sequence) const
+    void store_head(T& buffer, char type, const sending_time& timestamp,
+                    std::uint64_t sequence) const
     {
         assert(!data_.empty());
         const auto x = digits10(sequence);
         const auto n = data_.size();
-        auto p = buffer.append(&data_.front(), n + x + 1);
+        auto p = buffer.append(&data_.front(), n + x + 1 + timestamp.size());
         p[begin_off_] = std::byte(type);
-        num2str(p + n, sequence, x);
+        std::memcpy(p + n, timestamp.data(), timestamp.size());
+        num2str(p + n + timestamp.size(), sequence, x);
     }
 
     template <typename T>
-    void store(T& buffer, std::string_view type, std::uint64_t sequence) const
+    void store_head(T& buffer, std::string_view type,
+                    const sending_time& timestamp,
+                    std::uint64_t sequence) const
     {
-        auto dig = digits10(sequence);
-        auto off = begin_off_;
-        auto dst = buffer.append(data_.size() + type.size() + dig);
-        auto src = data_.data();
-        std::memcpy(dst, src, off);
-        dst += off;
-        std::memcpy(dst, type.data(), type.size());
-        dst += type.size();
-        src += off;
-        auto n = static_cast<std::size_t>(&data_.back() - src);
-        std::memcpy(dst, src + 1, n);
-        dst += n;
-        num2str(dst, sequence, dig);
+        const auto dig = digits10(sequence);
+        store_head(
+            buffer.append(data_.size() + timestamp.size() + type.size() + dig),
+            dig, type, timestamp, sequence
+        );
     }
-
-    void store_tail(std::byte* data, std::byte* last_tag) const;
 
     template <typename T>
     void store_tail(T& buffer) const
     {
         auto last_tag = buffer.append(7);
-        store_tail(
-            static_cast<std::byte*>(buffer.data()),
-            static_cast<std::byte*>(last_tag)
-        );
+        store_tail(static_cast<std::byte*>(buffer.data()),
+                   static_cast<std::byte*>(last_tag));
     }
 
 private:
+    void store_tail(std::byte* data, std::byte* last_tag) const;
+
+    void store_head(std::byte* dst, unsigned int dig,
+                    std::string_view type, const sending_time& timestamp,
+                    std::uint64_t sequence) const;
+
     /// @todo Allocate all at once.
     std::vector<std::byte> data_;
     unsigned int begin_off_{};
@@ -97,14 +93,4 @@ private:
 
 } // namespace fix
 
-#define FIX_STORE_BEGIN(Buffer, Header, Type, Sequence) \
-    do {                                                \
-        (Header).store((Buffer), (Type), (Sequence));   \
-    } while (false)
-
-#define FIX_STORE_END(Buffer, Header)                   \
-    do {                                                \
-        (Header).store_tail((Buffer));                  \
-    } while (false)
-
-#endif // FIX_STORE_HEADER_HH
+#endif // FIX_STORE_CONTEXT_HH
