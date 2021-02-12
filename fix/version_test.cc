@@ -15,8 +15,8 @@
 // Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#include "../test/test.hh"
 #include "version.hh"
+#include <gtest/gtest.h>
 #include <string>
 
 TEST(Version, Parts) {
