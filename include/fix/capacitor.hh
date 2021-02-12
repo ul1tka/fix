@@ -18,9 +18,9 @@
 #ifndef FIX_CAPACITOR_HH
 #define FIX_CAPACITOR_HH
 
-#include "compiler.hh"
-#include <cstddef>
+#include "../../fix/compiler.hh"
 #include <cassert>
+#include <cstddef>
 #include <vector>
 
 namespace fix {

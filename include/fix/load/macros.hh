@@ -18,9 +18,9 @@
 #ifndef FIX_LOAD_MACROS_HH
 #define FIX_LOAD_MACROS_HH
 
-#include "../compiler.hh"
-#include "tag.hh"
+#include "../../../fix/compiler.hh"
 #include "skip.hh"
+#include "tag.hh"
 
 #define FIX_LOAD_BEGIN(Data, Tag, Field)            \
     FIX_LOAD_BEGIN_(Data, Tag)                      \

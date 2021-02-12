@@ -1,14 +1,18 @@
 #
 # Copyright (C) 2012-2021 Vlad Lazarenko <vlad@lazarenko.me>
 #
-# This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
-# License as published by the Free Software Foundation; version 2 of the License.
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
 #
-# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
 #
-# You should have received a copy of the GNU General Public License along with this program; if not, write to the Free
-# Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
 cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
@@ -72,23 +76,17 @@ endif ()
 set(FIX_VERSION 1)
 set(FIX_MAX_BODY_LENGTH_DIGITS 5)
 
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/fix/detail)
+configure_file(fix/internal/version.hh.in
+               ${CMAKE_CURRENT_BINARY_DIR}/include/fix/internal/version.hh
+               @ONLY NEWLINE_STYLE UNIX)
 
-configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/fix/detail/version.hh.in
-        ${CMAKE_CURRENT_BINARY_DIR}/include/fix/detail/version.hh
-        @ONLY NEWLINE_STYLE UNIX
-)
-
-configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/fix/config.hh.in
-        ${CMAKE_CURRENT_BINARY_DIR}/include/fix/config.hh
-        @ONLY NEWLINE_STYLE UNIX
-)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/fix/config.hh.in
+               ${CMAKE_CURRENT_BINARY_DIR}/include/fix/config.hh
+               @ONLY NEWLINE_STYLE UNIX)
 
 add_library(
         fix-engine
-        src/version.cc
+        fix/version.cc
         src/chrono.cc
         src/decimal.cc
         src/digits10.cc
@@ -127,7 +125,7 @@ endif ()
 
 add_executable(
         test-fix-engine
-        test/version_test.cc
+        fix/version_test.cc
         test/likely_unlikely_test.cc
         test/capacitor_test.cc
         test/decimal_test.cc

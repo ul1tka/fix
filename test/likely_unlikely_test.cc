@@ -15,9 +15,9 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-#include <fix/compiler.hh>
-#include <type_traits>
+#include "../fix/compiler.hh"
 #include "test.hh"
+#include <type_traits>
 
 #ifndef FIX_LIKELY
 # erorr "FIX_LIKELY macro is not defined"

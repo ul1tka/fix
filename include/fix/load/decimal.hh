@@ -18,10 +18,10 @@
 #ifndef FIX_LOAD_DECIMAL_HH
 #define FIX_LOAD_DECIMAL_HH
 
-#include "../compiler.hh"
+#include "../../../fix/compiler.hh"
 #include "../decimal.hh"
-#include <cstddef>
 #include <cassert>
+#include <cstddef>
 
 namespace fix {
 
